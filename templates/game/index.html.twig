@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/game_list.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="background-slideshow" id="backgroundSlideshow"></div>
+    <header class="site-header">
+        <h1 class="site-title">Avalanche</h1>
+        <form action="{{ path('game_list') }}" method="get" class="search-form">
+            <div class="search-container">
+                <input type="text" name="search" value="{{ search }}" placeholder="Rechercher un jeu...">
+                <button type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+        {% if search %}
+            <div class="home-button-container">
+                <a href="{{ path('game_list') }}" class="home-button">
+                    <i class="fas fa-home"></i> Retour à l'accueil
+                </a>
+            </div>
+        {% endif %}
+    </header>
+</div>
+    <div class="content-wrapper">
+        <h2 class="section-title">
+        {% if search %}
+            Résultats pour "{{ search }}"
+        {% else %}
+            Jeux à venir
+        {% endif %}
+            </h2>
+
+        {% if upcominggames is empty %}
+            <p class="no-games">Aucun jeu trouvé.</p>
+        {% else %}
+            <div class="games-grid">
+                {% for game in upcominggames %}
+                    <div class="game-card">
+                        <div class="game-card-inner">
+                            {% if game.cover.url is defined %}
+                                <div class="game-image">
+                                    <img src="{{ game.cover.url }}" alt="{{ game.name }} cover">
+                                </div>
+                            {% endif %}
+                            <div class="game-info">
+                                <h3>{{ game.name }}</h3>
+                                {% if game.release_date is defined %}
+                                    <p class="release-date">Sortie le {{ game.release_date|default('À venir') }}</p>
+                                {% endif %}
+                                <p class="summary">{{ game.summary|default('Pas de résumé disponible')|slice(0, 100) }}...</p>
+                                <a href="{{ path('game_details', {'id': game.id}) }}" class="details-link">En savoir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ path('game_list', { 'page': page - 1, 'search': search }) }}" class="page-link prev">
+                    <i class="fas fa-chevron-left"></i> Précédent
+                </a>
+            {% endif %}
+            <span class="current-page">Page {{ page }}</span>
+            {% if upcominggames|length >= limit %}
+                <a href="{{ path('game_list', { 'page': page + 1, 'search': search }) }}" class="page-link next">
+                    Suivant <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.ffArtworks = {{ ffArtworks|json_encode|raw }};
+    </script>
+    <script src="{{ asset('js/search.js') }}" defer></script>
+{% endblock %}

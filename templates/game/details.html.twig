@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ game.name|default('Inconnu') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/details.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="navigation-header">
+    <a href="{{ path('game_list') }}" class="back-button">
+        <i class="fas fa-chevron-left"></i>
+        Retour
+    </a>
+</div>
+    <div class="game-details-container">
+        <div class="game-header">
+            {% if game.cover is defined and game.cover.url is defined %}
+                <img src="{{ game.cover.url|replace({'thumb': 'cover_big'}) }}" 
+                     alt="{{ game.name|default('Jeu') }} cover" 
+                     class="game-cover">
+            {% endif %}
+            
+            <div class="game-title-info">
+                <h1>{{ game.name|default('Jeu inconnu') }}</h1>
+                <div class="game-meta">
+                    {% if game.first_release_date is defined %}
+                        <span class="release-date">
+                            <i class="fas fa-calendar"></i>
+                            {{ game.first_release_date|date('d/m/Y') }}
+                        </span>
+                    {% endif %}
+                    
+                    {% if game.genres is defined %}
+                        <div class="genres">
+                            {% for genre in game.genres %}
+                                <span class="genre-tag">{{ genre.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <div class="main-info">
+                {% if game.summary is defined %}
+                    <section class="info-card">
+                        <h2><i class="fas fa-book"></i> Synopsis</h2>
+                        <p>{{ game.summary }}</p>
+                    </section>
+                {% endif %}
+
+                {% if game.storyline is defined %}
+                    <section class="info-card">
+                        <h2><i class="fas fa-scroll"></i> Histoire</h2>
+                        <p>{{ game.storyline }}</p>
+                    </section>
+                {% endif %}
+            </div>
+
+            <div class="side-info">
+                {% if game.platforms is defined %}
+                    <section class="info-card">
+                        <h2><i class="fas fa-gamepad"></i> Plateformes</h2>
+                        <div class="platforms-grid">
+                            {% for platform in game.platforms %}
+                                <div class="platform">
+                                    {% if platform.platform_logo is defined %}
+                                        <img src="{{ platform.platform_logo.url }}" alt="{{ platform.name }}">
+                                    {% endif %}
+                                    <span>{{ platform.name }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
+
+                {% if game.involved_companies is defined %}
+                    <section class="info-card">
+                        <h2><i class="fas fa-building"></i> Studios</h2>
+                        {% for company in game.involved_companies %}
+                            <div class="company">
+                                <h3>{{ company.company.name }}</h3>
+                                <div class="company-roles">
+                                    {% if company.developer %}<span class="role developer">Développeur</span>{% endif %}
+                                    {% if company.publisher %}<span class="role publisher">Éditeur</span>{% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+            </div>
+
+            {% if game.screenshots is defined %}
+                <section class="media-section">
+                    <h2><i class="fas fa-images"></i> Captures d'écran</h2>
+                    <div class="screenshots-grid">
+                        {% for screenshot in game.screenshots %}
+                            <div class="screenshot-item">
+                                <img src="{{ screenshot.url|replace({'thumb': 'screenshot_big'}) }}" 
+                                     alt="Screenshot {{ loop.index }}"
+                                     loading="lazy">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if game.videos is defined %}
+                <section class="media-section">
+                    <h2><i class="fas fa-play-circle"></i> Vidéos</h2>
+                    <div class="videos-grid">
+                        {% for video in game.videos %}
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/{{ video.video_id }}" 
+                                        frameborder="0" 
+                                        allowfullscreen
+                                        loading="lazy"></iframe>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if game.similar_games is defined %}
+                <section class="media-section">
+                    <h2><i class="fas fa-ghost"></i> Jeux similaires</h2>
+                    <div class="similar-games-grid">
+                        {% for similar in game.similar_games %}
+                            <a href="{{ path('game_details', {'id': similar.id}) }}" class="similar-game-card">
+                                {% if similar.cover is defined %}
+                                    <img src="{{ similar.cover.url|replace({'thumb': 'cover_big'}) }}" 
+                                         alt="{{ similar.name }}"
+                                         loading="lazy">
+                                {% endif %}
+                                <div class="similar-game-info">
+                                    <h3>{{ similar.name }}</h3>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
